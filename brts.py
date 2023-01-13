@@ -9,7 +9,7 @@ import mysql.connector as mysql
 #  BOT STARTUP
 #
 
-BOT_TOKEN = '5973401111:AAFOc6qGicHyTuvmEG86Be3H904ZmAZz7Fw'
+BOT_TOKEN = '(УДАЛЕНО)'
 
 updater = telegram.ext.Updater(token=BOT_TOKEN, use_context=True)
 dispatcher = updater.dispatcher
