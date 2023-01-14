@@ -21,7 +21,7 @@ dispatcher = updater.dispatcher
 try:
     hostname: str = "tabeltabel.mysql.pythonanywhere-services.com"
     username: str = "tabeltabel"
-    password: str = "cooldatabase"
+    password: str = "(УДАЛЕНО)"
 
     connection = mysql.connect(host=hostname, user=username, password=password, database="tabeltabel$bar_db")
 
