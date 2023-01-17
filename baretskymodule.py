@@ -50,6 +50,9 @@ def mysql_makeUpdateQuery(connection, query: str) -> None:
 
 
 def chat_check(func):
+    """
+    Does not allow to use the bot away from the club
+    """
 
     @ft.wraps(func)
     def inner(update, context):
@@ -64,6 +67,33 @@ def chat_check(func):
             func(update, context)
 
     return inner
+
+
+def with_mysql(func):
+    """
+    MySQL connections crash after some time so we need to reopen it every time
+    we call a function that uses mysql
+    """
+
+    @ft.wraps(func)
+    def inner(*args, **kwargs):
+
+        # data for connecting
+        hostname: str = "tabeltabel.mysql.pythonanywhere-services.com"
+        username: str = "tabeltabel"
+        password: str = "REDACTED"
+
+        # connects to the database
+        connection = mysql.connect(host=hostname, user=username, password=password, database="tabeltabel$bar_db")
+
+        # wrapped funtion
+        func(*args, connection, **kwargs)
+
+        # closes the connection
+        connection.close()
+
+    return inner
+
 
 
 
