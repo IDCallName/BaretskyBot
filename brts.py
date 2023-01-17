@@ -9,30 +9,10 @@ import mysql.connector as mysql
 #  BOT STARTUP
 #
 
-BOT_TOKEN = '(УДАЛЕНО)'
+BOT_TOKEN = 'REDACTED'
 
 updater = telegram.ext.Updater(token=BOT_TOKEN, use_context=True)
 dispatcher = updater.dispatcher
-
-#
-#  CONNECTING TO MYSQL SERVER
-#
-
-try:
-    hostname: str = "tabeltabel.mysql.pythonanywhere-services.com"
-    username: str = "tabeltabel"
-    password: str = "(УДАЛЕНО)"
-
-    connection = mysql.connect(host=hostname, user=username, password=password, database="tabeltabel$bar_db")
-
-except mysql.Error as err:
-    print(err)
-
-#
-#  FUNCTIONS
-#
-
-# obsolete
 
 #
 #  COMMANDS
@@ -49,7 +29,8 @@ def cmd_start(update, context) -> None:
 
 
 @bm.chat_check
-def cmd_klov(update, context) -> None:
+@bm.with_mysql
+def cmd_klov(update, context, connection) -> None:
     """
     Makes repliant a klov of the day
     """
@@ -86,7 +67,8 @@ def cmd_klov(update, context) -> None:
 
 
 @bm.chat_check
-def cmd_get_klov(update, context) -> None:
+@bm.with_mysql
+def cmd_get_klov(update, context, connection) -> None:
     """
     Gets two klovs of the day from DB
     """
@@ -118,7 +100,8 @@ def cmd_get_klov(update, context) -> None:
 
 
 @bm.chat_check
-def cmd_add_track(update, context):
+@bm.with_mysql
+def cmd_add_track(update, context, connection):
 
     # making something readable from context.args
     argstring = " ".join(context.args)
@@ -133,13 +116,14 @@ def cmd_add_track(update, context):
 
     # sending tutorial message otherwise
     else:
-        msg = "Введите комманду в формате /add_track имя трека : описание трека : автор трека"
+        msg = "Введите комманду в формате \"/add_track имя трека : описание трека : автор трека\" <b>в ответ на сообщение с треком</b>"
 
-    context.bot.send_message(chat_id=update.effective_chat.id, text=msg)
+    context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode='HTML')
 
 
 @bm.chat_check
-def cmd_get_track(update, context):
+@bm.with_mysql
+def cmd_get_track(update, context, connection):
 
     # turns args into a track name
     track_name = " ".join(context.args)
@@ -147,8 +131,8 @@ def cmd_get_track(update, context):
     # gets track
     track = bm.Track(connection, track_name)
 
-    msg = f"*{track.track_name.capitalize()}*\n\n_Автор: {track.track_author}_\n\n{track.track_description}"
-    context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode='MarkdownV2')
+    msg = f"<b>{track.track_name.capitalize()}</b>\n\n<i>Автор: {track.track_author}</i>\n\n{track.track_description}"
+    context.bot.send_message(chat_id=update.effective_chat.id, text=msg, parse_mode='HTML')
 
     if track.track_msg != None:
         context.bot.forward_message(update.effective_chat.id, bm.CLUB_ID, track.track_msg)
@@ -157,6 +141,10 @@ def cmd_get_track(update, context):
         context.bot.send_message(chat_id=update.effective_chat.id, text=msg)
 
 
+@bm.chat_check
+@bm.with_mysql
+def cmd_tracklist(update, context, connection):
+    pass
 
 #
 #  HANDLERS
